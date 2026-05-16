@@ -3,952 +3,863 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rapporthjelper – Årlig kontroll</title>
+  <title>Ascom Rapporthjelper</title>
   <style>
     :root {
-      --bg: #f3f6fb;
-      --card: #ffffff;
-      --text: #152033;
-      --muted: #64748b;
-      --line: #d9e2ef;
-      --blue: #0057d9;
-      --blue2: #003f9e;
-      --soft-blue: #eef5ff;
-      --green: #166534;
-      --green-bg: #e8f5ed;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #111827;
+      --muted: #667085;
+      --line: #d0d5dd;
+      --line2: #eaecf0;
+      --blue: #005eb8;
+      --blue-dark: #004a91;
+      --green: #067647;
+      --green-bg: #ecfdf3;
       --red: #b42318;
-      --red-bg: #fff1f0;
-      --yellow-bg: #fff8e6;
-      --shadow: 0 20px 55px rgba(15, 23, 42, .09);
-      --radius: 22px;
+      --red-bg: #fef3f2;
+      --yellow-bg: #fffaeb;
+      --yellow-line: #fedf89;
+      --radius: 14px;
+      --shadow: 0 12px 30px rgba(16, 24, 40, .06);
     }
 
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
-      background:
-        radial-gradient(circle at top left, #dceaff 0, transparent 34%),
-        linear-gradient(180deg, #f7faff 0, var(--bg) 100%);
+      background: var(--bg);
       color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
     }
 
-    .app-shell {
-      max-width: 1320px;
+    .wrap {
+      max-width: 1120px;
       margin: 0 auto;
-      padding: 28px 22px 44px;
+      padding: 24px 16px 44px;
     }
 
-    .topbar {
+    header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 18px;
-      margin-bottom: 20px;
+      gap: 16px;
+      margin-bottom: 18px;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-      min-width: 0;
+      gap: 14px;
     }
 
-    .logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: var(--blue);
-      color: white;
-      font-weight: 900;
-      box-shadow: 0 12px 30px rgba(0, 87, 217, .25);
-      flex: 0 0 auto;
-    }
-
-    .brand-text strong { display: block; font-size: 16px; }
-    .brand-text span { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
-
-    .status-pill {
-      border: 1px solid #b8e2c5;
-      background: var(--green-bg);
-      color: var(--green);
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    .hero {
-      background: linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
-      border: 1px solid var(--line);
-      border-radius: 30px;
-      box-shadow: var(--shadow);
-      padding: 30px;
-      margin-bottom: 22px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      width: 260px;
-      height: 260px;
-      right: -90px;
-      top: -100px;
-      background: rgba(0, 87, 217, .08);
-      border-radius: 999px;
-    }
-
-    .eyebrow {
-      margin: 0 0 10px;
+    .ascom-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 118px;
+      height: 44px;
+      padding: 0 14px;
+      border-radius: 12px;
+      background: #ffffff;
+      border: 1px solid var(--line2);
+      box-shadow: 0 8px 22px rgba(16, 24, 40, .06);
       color: var(--blue);
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: .08em;
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.08em;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .ascom-logo .a,
+    .ascom-logo .s,
+    .ascom-logo .c,
+    .ascom-logo .o,
+    .ascom-logo .m {
+      display: inline-block;
+    }
+
+    .ascom-logo .a { letter-spacing: -0.09em; }
+    .ascom-logo .s { letter-spacing: -0.10em; }
+    .ascom-logo .c { letter-spacing: -0.10em; }
+    .ascom-logo .o { letter-spacing: -0.10em; }
+    .ascom-logo .m { letter-spacing: -0.02em; }
+
+    .brand h1 {
+      font-size: 20px;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--muted);
       font-size: 13px;
     }
 
-    h1, h2, h3 { margin: 0; line-height: 1.1; }
-    h1 { max-width: 900px; font-size: clamp(32px, 4.6vw, 54px); letter-spacing: -0.03em; }
-    h2 { font-size: 21px; letter-spacing: -0.01em; }
-    h3 { font-size: 16px; }
-
-    .subtitle {
-      max-width: 850px;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 17px;
-      margin: 14px 0 0;
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 350px;
-      gap: 22px;
-      align-items: start;
-    }
-
-    .main-stack { display: grid; gap: 22px; }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line2);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 22px;
+      padding: 18px;
+      margin-bottom: 16px;
     }
 
-    .side-card {
-      position: sticky;
-      top: 18px;
-    }
-
-    .header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .muted { color: var(--muted); font-size: 13px; line-height: 1.45; }
-
-    .grid {
+    .context-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
+      grid-template-columns: 1.2fr 1.2fr 1fr 1fr;
+      gap: 12px;
     }
 
     label {
       display: grid;
-      gap: 8px;
+      gap: 6px;
+      font-weight: 700;
       font-size: 13px;
-      font-weight: 850;
-      color: #2b3b55;
+      color: #344054;
     }
 
     input, select, textarea {
       width: 100%;
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px 13px;
+      border-radius: 10px;
+      padding: 10px 11px;
       font: inherit;
-      background: #fbfdff;
+      background: #fff;
       color: var(--text);
       outline: none;
-      transition: border-color .15s, box-shadow .15s, background .15s;
     }
 
     textarea {
-      min-height: 118px;
+      min-height: 115px;
       resize: vertical;
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
     input:focus, select:focus, textarea:focus {
       border-color: var(--blue);
-      background: #fff;
-      box-shadow: 0 0 0 4px rgba(0, 87, 217, .10);
+      box-shadow: 0 0 0 3px rgba(0, 94, 184, .12);
     }
 
-    .context-help {
-      margin-top: 16px;
-      padding: 16px;
-      border: 1px solid #cfe0f8;
-      border-radius: 18px;
-      background: var(--soft-blue);
-    }
-
-    .context-help p { margin: 8px 0 0; color: var(--muted); line-height: 1.45; }
-
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-
-    .chip {
-      width: auto;
-      border: 1px solid var(--line);
-      background: white;
-      color: #334155;
-      border-radius: 999px;
-      padding: 9px 12px;
-      font-weight: 750;
-      text-align: left;
-    }
-
-    .chip:hover { border-color: var(--blue); color: var(--blue); }
-
-    .field-block {
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      background: linear-gradient(180deg, #ffffff 0, #fbfdff 100%);
-      padding: 18px;
-      margin-bottom: 16px;
-    }
-
-    .field-block:last-child { margin-bottom: 0; }
-
-    .field-head {
+    .section-title {
       display: flex;
-      align-items: flex-start;
       justify-content: space-between;
-      gap: 14px;
+      align-items: baseline;
+      gap: 12px;
       margin-bottom: 12px;
     }
 
-    .field-title {
-      display: block;
-      font-size: 14px;
-      font-weight: 950;
-      letter-spacing: .02em;
-      color: #1f2f46;
+    .section-title h2 {
+      font-size: 16px;
+      margin: 0;
     }
 
-    .field-description {
+    .hint {
       color: var(--muted);
       font-size: 13px;
-      margin-top: 4px;
       line-height: 1.4;
     }
 
-    .field-actions {
-      display: grid;
-      grid-template-columns: minmax(160px, 1fr) auto auto;
-      gap: 10px;
-      margin-top: 10px;
+    .field {
+      border: 1px solid var(--line2);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: #fff;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .field-name {
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: .02em;
+    }
+
+    .field-help {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
     }
 
     button {
-      border: 0;
-      border-radius: 14px;
-      padding: 12px 15px;
-      cursor: pointer;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 9px 12px;
       font: inherit;
-      font-weight: 850;
-      background: #e8eef8;
-      color: var(--text);
-      transition: transform .12s, filter .12s, background .12s;
+      font-weight: 700;
+      cursor: pointer;
+      background: #f2f4f7;
+      color: #344054;
     }
 
-    button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(.98); }
-    button:disabled { opacity: .65; cursor: not-allowed; }
-
-    .primary { background: var(--blue); color: #fff; }
-    .primary:hover:not(:disabled) { background: var(--blue2); }
-    .danger { background: var(--red-bg); color: var(--red); }
-    .ghost { background: #f2f6fb; color: #475569; }
-    .small { padding: 9px 12px; font-size: 13px; white-space: nowrap; }
-
-    .button-stack { display: grid; gap: 10px; margin-top: 14px; }
-
-    .check {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin: 12px 0;
-      font-size: 14px;
-      font-weight: 650;
-      color: #334155;
+    button:hover:not(:disabled) {
+      filter: brightness(.98);
     }
 
-    .check input { width: auto; margin-top: 3px; }
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
 
-    hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+    .primary {
+      background: var(--blue);
+      color: #fff;
+    }
 
-    .warning-box, .status-box {
-      margin-top: 16px;
-      padding: 14px;
-      border-radius: 16px;
-      font-size: 13px;
+    .primary:hover:not(:disabled) {
+      background: var(--blue-dark);
+    }
+
+    .secondary {
+      background: #eef4ff;
+      color: #004a91;
+      border-color: #c7d7fe;
+    }
+
+    .danger {
+      background: var(--red-bg);
+      color: var(--red);
+      border-color: #fecdca;
+    }
+
+    .output-box {
+      display: none;
+      margin-top: 10px;
+      border: 1px solid var(--yellow-line);
+      background: var(--yellow-bg);
+      border-radius: 10px;
+      padding: 11px;
+      color: #533f04;
       line-height: 1.45;
       white-space: pre-wrap;
-      word-break: break-word;
     }
 
-    .warning-box {
-      background: var(--yellow-bg);
-      border: 1px solid #f2d58b;
-      color: #6b4e00;
+    .output-box.show {
+      display: block;
     }
 
-    .status-box {
-      background: #f8fafc;
+    .status {
       border: 1px solid var(--line);
-      color: #334155;
-      min-height: 48px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 12px;
+      color: var(--muted);
+      min-height: 42px;
+      line-height: 1.4;
+      white-space: pre-wrap;
     }
 
-    .status-box.ok {
+    .status.ok {
       background: var(--green-bg);
-      border-color: #b8e2c5;
+      border-color: #abefc6;
       color: var(--green);
     }
 
-    .status-box.error {
+    .status.err {
       background: var(--red-bg);
-      border-color: #ffcbc7;
+      border-color: #fecdca;
       color: var(--red);
     }
 
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 22px;
-      transform: translateX(-50%);
-      background: #0f172a;
-      color: white;
-      border-radius: 999px;
-      padding: 12px 16px;
-      font-weight: 800;
-      box-shadow: 0 14px 35px rgba(15, 23, 42, .25);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .15s, transform .15s;
-      z-index: 100;
+    .quick-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
     }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(-4px);
+    .quick-points button {
+      font-size: 12px;
+      padding: 7px 9px;
+      background: #fff;
+      border-color: var(--line);
+      color: #475467;
     }
 
-    .footer-note {
+    .copyarea {
+      min-height: 230px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+      background: #fcfcfd;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 330px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .side {
+      position: sticky;
+      top: 12px;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      margin: 10px 0 0;
+    }
+
+    .footer {
       text-align: center;
       color: var(--muted);
       font-size: 12px;
-      margin-top: 22px;
+      margin-top: 18px;
     }
 
-    @media (max-width: 1100px) {
-      .layout { grid-template-columns: 1fr; }
-      .side-card { position: static; }
-      .grid { grid-template-columns: 1fr 1fr; }
-    }
+    @media (max-width: 950px) {
+      header, .field-head {
+        display: block;
+      }
 
-    @media (max-width: 680px) {
-      .app-shell { padding: 18px 12px 32px; }
-      .topbar, .header-row, .field-head { display: block; }
-      .status-pill { display: inline-block; margin-top: 12px; }
-      .hero { padding: 22px; }
-      .grid { grid-template-columns: 1fr; }
-      .field-actions { grid-template-columns: 1fr; }
+      .brand {
+        align-items: flex-start;
+      }
+
+      .ascom-logo {
+        margin-bottom: 8px;
+      }
+
+      .top-actions {
+        justify-content: flex-start;
+        margin-top: 12px;
+      }
+
+      .context-grid, .split {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        position: static;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <div class="topbar">
+  <div class="wrap">
+    <header>
       <div class="brand">
-        <div class="logo">R</div>
-        <div class="brand-text">
-          <strong>Rapporthjelper</strong>
-          <span>For årlig kontroll og kundevennlige rapportfelt</span>
+        <div class="ascom-logo" aria-label="Ascom">
+          <span class="a">a</span><span class="s">s</span><span class="c">c</span><span class="o">o</span><span class="m">m</span>
+        </div>
+        <div>
+          <h1>Rapporthjelper</h1>
+          <p>Minimal støtte for formulering av kunderapport etter årlig kontroll</p>
         </div>
       </div>
-      <div class="status-pill">Feltvis AI-forslag</div>
-    </div>
 
-    <section class="hero">
-      <p class="eyebrow">Årlig kontroll</p>
-      <h1>Formuler rapportfelt raskere og ryddigere</h1>
-      <p class="subtitle">
-        Skriv råtekst i ett rapportfelt, velg relevant system, område og status, og trykk
-        <strong>Generer forslag</strong>. Forslaget erstatter teksten i samme boks, slik at du kan redigere videre.
-      </p>
+      <div class="top-actions">
+        <button id="exampleBtn">Last eksempel</button>
+        <button id="copyReportTop" class="primary">Kopier rapport</button>
+      </div>
+    </header>
+
+    <section class="panel">
+      <div class="section-title">
+        <h2>Kontekst</h2>
+        <span class="hint">Dette brukes for bedre faglig formulering. Det er ikke pynt.</span>
+      </div>
+
+      <div class="context-grid">
+        <label>
+          System / produkt
+          <select id="system">
+            <option>TelecareIP / NISM - pasientvarsling</option>
+            <option>AWA View - visning og alarmflyt</option>
+            <option>Unite - meldingsflyt og alarmhåndtering</option>
+            <option>IP-DECT / DECT - telefoni</option>
+            <option>Myco - mobile enheter</option>
+            <option>Posisjonssendere / smykker</option>
+            <option>Strømforsyning / UPS</option>
+            <option>Fjerndrift / tilgang</option>
+            <option>Jira / saksoppfølging</option>
+            <option>Annet</option>
+          </select>
+        </label>
+
+        <label>
+          Område
+          <select id="area">
+            <option>Årlig kontroll</option>
+            <option>Kundesamtale</option>
+            <option>Logg / hendelseslogg</option>
+            <option>Backup</option>
+            <option>Software / versjon</option>
+            <option>Hardware / EOL / EOS</option>
+            <option>Funksjonstest</option>
+            <option>Alarmflyt / varsling</option>
+            <option>Rom / lokasjon</option>
+            <option>Fjerntilgang</option>
+            <option>Oppgradering</option>
+            <option>Utbedring</option>
+            <option>Avvik / oppfølging</option>
+          </select>
+        </label>
+
+        <label>
+          Status
+          <select id="status">
+            <option>Ikke valgt</option>
+            <option>Ingen avvik</option>
+            <option>Mindre avvik</option>
+            <option>Kritisk avvik</option>
+            <option>Ikke utført</option>
+            <option>Krever oppfølging</option>
+            <option>Jira-sak opprettet</option>
+            <option>Kunde informert</option>
+          </select>
+        </label>
+
+        <label>
+          Stil
+          <select id="style">
+            <option value="kunde">Kundevennlig</option>
+            <option value="kort">Kort og presis</option>
+            <option value="teknisk">Mer teknisk</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="quick-points" id="quickPoints"></div>
+      <div class="status" id="statusBox">Klar. Skriv tekst i et felt og trykk “Forbedre tekst”, eller trykk “Mangler jeg noe?” for forslag til punkter.</div>
     </section>
 
-    <main class="layout">
-      <div class="main-stack">
-        <section class="card">
-          <div class="header-row">
-            <div>
-              <h2>1. Kontekst</h2>
-              <p class="muted">Valgene under brukes som bakgrunn når AI formulerer feltet.</p>
-            </div>
-            <button id="exampleBtn" type="button" class="ghost small">Last eksempel</button>
-          </div>
-
-          <div class="grid">
-            <label>
-              System
-              <select id="system">
-                <option>TelecareIP / NISM (pasientvarsling)</option>
-                <option>AWA View</option>
-                <option>Unite / Ascom-system</option>
-                <option>IP-DECT / telefoni</option>
-                <option>Myco-telefoner</option>
-                <option>Posisjonssendere / smykker</option>
-                <option>Fjerndrift / tilgang</option>
-                <option>Annet</option>
-              </select>
-            </label>
-
-            <label>
-              Område
-              <select id="area">
-                <option>Logg / hendelseslogg</option>
-                <option>Kundesamtale</option>
-                <option>NISM GUI / statusbilde</option>
-                <option>Backup</option>
-                <option>Software-versjon</option>
-                <option>Hardware / EOL / EOS</option>
-                <option>Funksjonstest</option>
-                <option>Varsling / alarmflyt</option>
-                <option>Smykker / beboerutstyr</option>
-                <option>Rom / lokasjon</option>
-                <option>Fjerndrift</option>
-                <option>Oppgradering</option>
-                <option>Utbedring</option>
-                <option>Anbefalt tiltak</option>
-              </select>
-            </label>
-
-            <label>
-              Status
-              <select id="status">
-                <option>Ikke valgt</option>
-                <option>Ingen avvik</option>
-                <option>Mindre avvik</option>
-                <option>Kritisk avvik</option>
-                <option>Ikke utført</option>
-                <option>Ikke del av løsning</option>
-                <option>Krever oppfølging</option>
-                <option>JIRA-sak opprettet</option>
-                <option>Kunde informert</option>
-              </select>
-            </label>
-
-            <label>
-              Formulering
-              <select id="style">
-                <option value="kundevennlig">Kundevennlig</option>
-                <option value="kort">Kort og presis</option>
-                <option value="teknisk">Mer teknisk</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="context-help">
-            <h3>Forslagspunkter</h3>
-            <p id="hintText">Velg system, område og status for relevante punkter.</p>
-            <div id="chips" class="chips"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="header-row">
-            <div>
-              <h2>2. Rapportfelt</h2>
-              <p class="muted">Trykk “Generer forslag” på feltet du vil forbedre. Bare det feltet blir endret.</p>
-            </div>
-          </div>
-
-          <div class="field-block">
-            <div class="field-head">
-              <div>
-                <span class="field-title">OPPSUMMERING FRA KUNDESAMTALE MED:</span>
-                <div class="field-description">Kundens tilbakemelding, status og eventuelle ting som ble tatt opp i samtalen.</div>
-              </div>
-            </div>
-            <label>
-              Navn på kontaktperson
-              <input id="contact" placeholder="F.eks. Kari" />
-            </label>
-            <textarea id="summary" data-section-title="OPPSUMMERING FRA KUNDESAMTALE" placeholder="Skriv råtekst fra kundesamtalen her..."></textarea>
-            <div class="field-actions">
-              <button type="button" class="primary generate-one" data-target="summary">Generer forslag</button>
-              <button type="button" class="ghost undo-one" data-target="summary">Angre</button>
-              <button type="button" class="ghost copy-one" data-target="summary">Kopier felt</button>
-            </div>
-          </div>
-
-          <div class="field-block">
-            <div class="field-head">
-              <div>
-                <span class="field-title">OPPDATERINGER OG OPPGRADERINGER:</span>
-                <div class="field-description">Oppgraderinger, versjonsendringer eller beskjed om at dette ikke er utført.</div>
-              </div>
-            </div>
-            <textarea id="updates" data-section-title="OPPDATERINGER OG OPPGRADERINGER" placeholder="F.eks. Ingen oppdatering eller oppgradering utført."></textarea>
-            <div class="field-actions">
-              <button type="button" class="primary generate-one" data-target="updates">Generer forslag</button>
-              <button type="button" class="ghost undo-one" data-target="updates">Angre</button>
-              <button type="button" class="ghost copy-one" data-target="updates">Kopier felt</button>
-            </div>
-          </div>
-
-          <div class="field-block">
-            <div class="field-head">
-              <div>
-                <span class="field-title">UTBEDRINGER OG ENDRINGER:</span>
-                <div class="field-description">Endringer som er utført, feil som er rettet, eller avklaring om at ingen endringer er gjort.</div>
-              </div>
-            </div>
-            <textarea id="fixes" data-section-title="UTBEDRINGER OG ENDRINGER" placeholder="F.eks. Ingen utbedringer eller endringer utført."></textarea>
-            <div class="field-actions">
-              <button type="button" class="primary generate-one" data-target="fixes">Generer forslag</button>
-              <button type="button" class="ghost undo-one" data-target="fixes">Angre</button>
-              <button type="button" class="ghost copy-one" data-target="fixes">Kopier felt</button>
-            </div>
-          </div>
-
-          <div class="field-block">
-            <div class="field-head">
-              <div>
-                <span class="field-title">OBSERVASJON:</span>
-                <div class="field-description">Tekniske observasjoner, logger, romnummer, saksnummer, testresultater og videre oppfølging.</div>
-              </div>
-            </div>
-            <textarea id="observation" data-section-title="OBSERVASJON" placeholder="Skriv tekniske observasjoner her..."></textarea>
-            <div class="field-actions">
-              <button type="button" class="primary generate-one" data-target="observation">Generer forslag</button>
-              <button type="button" class="ghost undo-one" data-target="observation">Angre</button>
-              <button type="button" class="ghost copy-one" data-target="observation">Kopier felt</button>
-            </div>
-          </div>
-
-          <div class="field-block">
-            <div class="field-head">
-              <div>
-                <span class="field-title">KONKLUSJON:</span>
-                <div class="field-description">Kort oppsummering av status, avvik og eventuelle videre tiltak.</div>
-              </div>
-            </div>
-            <textarea id="conclusion" data-section-title="KONKLUSJON" placeholder="Skriv foreløpig konklusjon eller stikkord..."></textarea>
-            <div class="field-actions">
-              <button type="button" class="primary generate-one" data-target="conclusion">Generer forslag</button>
-              <button type="button" class="ghost undo-one" data-target="conclusion">Angre</button>
-              <button type="button" class="ghost copy-one" data-target="conclusion">Kopier felt</button>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <aside class="card side-card">
-        <h2>3. Ferdig rapport</h2>
-        <p class="muted">
-          Når feltene er formulert ferdig, kan du kopiere hele rapporten i riktig rekkefølge.
-        </p>
-
-        <div class="button-stack">
-          <button id="testAiBtn" type="button" class="ghost">Test AI-tilkobling</button>
-          <button id="copyReportBtn" type="button" class="primary">Kopier hele rapporten</button>
-          <button id="clearBtn" type="button" class="danger">Tøm alt</button>
+    <main class="split">
+      <section class="panel">
+        <div class="section-title">
+          <h2>Rapportfelt</h2>
+          <span class="hint">AI endrer kun feltet du trykker på.</span>
         </div>
 
-        <div id="statusBox" class="status-box">Status vises her når du tester eller genererer forslag.</div>
+        <div class="field">
+          <div class="field-head">
+            <div>
+              <div class="field-name">OPPSUMMERING FRA KUNDESAMTALE MED:</div>
+              <div class="field-help">Skriv kort hva kunden meldte, om systemet fungerer, og eventuelle bekymringer.</div>
+            </div>
+          </div>
+          <label>
+            Kontaktperson
+            <input id="contact" placeholder="F.eks. Nordmann" />
+          </label>
+          <textarea id="summary" data-title="OPPSUMMERING FRA KUNDESAMTALE" placeholder="Råtekst fra kundesamtale..."></textarea>
+          <div class="buttons">
+            <button class="primary improve" data-target="summary">Forbedre tekst</button>
+            <button class="secondary missing" data-target="summary">Mangler jeg noe?</button>
+            <button class="copy" data-target="summary">Kopier felt</button>
+          </div>
+          <div class="output-box" id="summarySuggestions"></div>
+        </div>
 
-        <hr />
+        <div class="field">
+          <div class="field-head">
+            <div>
+              <div class="field-name">OPPDATERINGER OG OPPGRADERINGER:</div>
+              <div class="field-help">Skriv om versjonsendring, oppgradering, eller at dette ikke er utført.</div>
+            </div>
+          </div>
+          <textarea id="updates" data-title="OPPDATERINGER OG OPPGRADERINGER" placeholder="F.eks. Ingen oppdatering eller oppgradering utført."></textarea>
+          <div class="buttons">
+            <button class="primary improve" data-target="updates">Forbedre tekst</button>
+            <button class="secondary missing" data-target="updates">Mangler jeg noe?</button>
+            <button class="copy" data-target="updates">Kopier felt</button>
+          </div>
+          <div class="output-box" id="updatesSuggestions"></div>
+        </div>
 
-        <label class="check">
-          <input id="noNewFacts" type="checkbox" checked />
-          Ikke legg til ny informasjon
-        </label>
+        <div class="field">
+          <div class="field-head">
+            <div>
+              <div class="field-name">UTBEDRINGER OG ENDRINGER:</div>
+              <div class="field-help">Skriv hva som er rettet, endret, byttet eller avklart.</div>
+            </div>
+          </div>
+          <textarea id="fixes" data-title="UTBEDRINGER OG ENDRINGER" placeholder="F.eks. Ingen utbedringer eller endringer utført."></textarea>
+          <div class="buttons">
+            <button class="primary improve" data-target="fixes">Forbedre tekst</button>
+            <button class="secondary missing" data-target="fixes">Mangler jeg noe?</button>
+            <button class="copy" data-target="fixes">Kopier felt</button>
+          </div>
+          <div class="output-box" id="fixesSuggestions"></div>
+        </div>
 
-        <label class="check">
-          <input id="keepTechnical" type="checkbox" checked />
-          Behold saksnummer, romnummer og systemnavn
-        </label>
+        <div class="field">
+          <div class="field-head">
+            <div>
+              <div class="field-name">OBSERVASJON:</div>
+              <div class="field-help">Skriv logger, test, romnummer, produkt, avvik, årsaksvurdering og eventuell sak.</div>
+            </div>
+          </div>
+          <textarea id="observation" data-title="OBSERVASJON" placeholder="Råtekst for observasjon..."></textarea>
+          <div class="buttons">
+            <button class="primary improve" data-target="observation">Forbedre tekst</button>
+            <button class="secondary missing" data-target="observation">Mangler jeg noe?</button>
+            <button class="copy" data-target="observation">Kopier felt</button>
+          </div>
+          <div class="output-box" id="observationSuggestions"></div>
+        </div>
 
-        <label class="check">
-          <input id="noSensitive" type="checkbox" checked />
-          Unngå person-/helseopplysninger
-        </label>
+        <div class="field">
+          <div class="field-head">
+            <div>
+              <div class="field-name">KONKLUSJON:</div>
+              <div class="field-help">Skriv samlet vurdering: fungerer systemet, avvik, risiko og videre oppfølging.</div>
+            </div>
+          </div>
+          <textarea id="conclusion" data-title="KONKLUSJON" placeholder="Foreløpig konklusjon..."></textarea>
+          <div class="buttons">
+            <button class="primary improve" data-target="conclusion">Forbedre tekst</button>
+            <button class="secondary missing" data-target="conclusion">Mangler jeg noe?</button>
+            <button class="copy" data-target="conclusion">Kopier felt</button>
+          </div>
+          <div class="output-box" id="conclusionSuggestions"></div>
+        </div>
+      </section>
 
-        <div class="warning-box">
-          Ikke lim inn sensitive personopplysninger, pasientopplysninger, passord eller interne nøkler.
+      <aside class="panel side">
+        <div class="section-title">
+          <h2>Ferdig tekst</h2>
+        </div>
+
+        <textarea id="reportPreview" class="copyarea" readonly></textarea>
+
+        <div class="buttons">
+          <button id="refreshPreview">Oppdater forhåndsvisning</button>
+          <button id="copyReport" class="primary">Kopier rapport</button>
+          <button id="clearAll" class="danger">Tøm</button>
+        </div>
+
+        <p class="small-note">
+          Ikke lim inn pasientopplysninger, fødselsnummer, passord eller sensitive helseopplysninger.
           Bruk teknisk tekst, romnummer, saksnummer og systemstatus.
-        </div>
+        </p>
       </aside>
     </main>
 
-    <p class="footer-note">Rapporthjelper – intern formulering av rapportfelt</p>
+    <div class="footer">Ascom Rapporthjelper – arbeidsverktøy for formulering, ikke erstatning for teknisk vurdering.</div>
   </div>
-
-  <div id="toast" class="toast">Kopiert</div>
 
   <script>
     const $ = (id) => document.getElementById(id);
+    const fields = ["summary", "updates", "fixes", "observation", "conclusion"];
+    const STORAGE_KEY = "ascom-rapporthjelper-minimal-v5";
 
-    const textFields = ["summary", "updates", "fixes", "observation", "conclusion"];
-    const allFields = ["contact", "system", "area", "status", "style", ...textFields, "noNewFacts", "keepTechnical", "noSensitive"];
-    const STORAGE_KEY = "rapporthjelper-proff-v4";
-    let activeTextareaId = "summary";
-    const previousValues = {};
-
-    const suggestionMap = {
-      "TelecareIP / NISM (pasientvarsling)|Logg / hendelseslogg": [
-        "Logger i NISM er kontrollert.",
-        "Det er ikke observert kritiske loggfeil som tilsier påvirkning på normal drift.",
-        "Eventuelle eldre loggmeldinger vurderes ikke å ha driftsmessig betydning på kontrolltidspunktet.",
-        "Videre oppfølging anbefales dersom tilsvarende hendelser oppstår på nytt."
+    const productPoints = {
+      "TelecareIP / NISM - pasientvarsling": [
+        "Logg gjennomgått",
+        "NISM status kontrollert",
+        "Varsling funksjonstestet",
+        "Offline enheter vurdert",
+        "Jira-sak ved avvik"
       ],
-      "TelecareIP / NISM (pasientvarsling)|NISM GUI / statusbilde": [
-        "NISM GUI er kontrollert.",
-        "Statusbildet viser normal tilgjengelighet for relevante komponenter.",
-        "Eventuelle enheter med avvik bør følges opp videre i egen sak."
+      "AWA View - visning og alarmflyt": [
+        "Visning oppdatert",
+        "Alarmflyt testet",
+        "Tjenester restartet ved behov",
+        "Feil mottakergruppe vurdert"
       ],
-      "TelecareIP / NISM (pasientvarsling)|Backup": [
-        "Backup er kontrollert der dette var tilgjengelig.",
-        "Dersom backup ikke er verifisert, bør dette følges opp med kundens IT eller via fjerntilgang.",
-        "Backup-status bør dokumenteres dersom det oppdages avvik."
+      "Unite - meldingsflyt og alarmhåndtering": [
+        "Meldingsflyt kontrollert",
+        "Distribusjonslogg vurdert",
+        "Integrasjon/nettverk vurdert",
+        "Tidspunkt sammenlignet med hendelse"
       ],
-      "TelecareIP / NISM (pasientvarsling)|Funksjonstest": [
-        "Funksjonstest av pasientvarsling er gjennomført der dette var relevant.",
-        "Varsling fra rom eller beboerutstyr bør kontrolleres mot mottak på relevant enhet.",
-        "Eventuelle avvik bør registreres med romnummer, tidspunkt og videre tiltak."
+      "IP-DECT / DECT - telefoni": [
+        "Registrering kontrollert",
+        "Intern/ekstern tale testet",
+        "Dekning vurdert",
+        "Basestasjon/status kontrollert"
       ],
-      "TelecareIP / NISM (pasientvarsling)|Smykker / beboerutstyr": [
-        "Smykker eller beboerutstyr er gjennomgått der dette var relevant.",
-        "Enheter som står offline, men fortsatt er aktive, bør kontrolleres eller settes ut av aktiv bruk.",
-        "Kunde er informert om videre håndtering av aktuelle enheter."
+      "Myco - mobile enheter": [
+        "Enhetsstatus kontrollert",
+        "Varsling mottatt på enhet",
+        "Batteri/lading vurdert",
+        "Reparasjon/logistikk ved defekt"
       ],
-      "AWA View|Varsling / alarmflyt": [
-        "AWA View er kontrollert med tanke på visning og alarmflyt.",
-        "Dersom alarmer ikke oppdateres korrekt i visningen, bør relevante tjenester restartes og funksjon testes på nytt.",
-        "Varsler som sendes til feil mottakergruppe bør følges opp i konfigurasjon eller ruting."
+      "Posisjonssendere / smykker": [
+        "Aktive/offline smykker vurdert",
+        "Lokasjon testet",
+        "Batteri/status kontrollert",
+        "Kunde informert om tiltak"
       ],
-      "Unite / Ascom-system|Logg / hendelseslogg": [
-        "Unite-relaterte logger er gjennomgått.",
-        "Det er ikke observert gjentakende feil som tilsier kritisk påvirkning på meldingsflyt.",
-        "Ved nye hendelser anbefales det å kontrollere tidspunkt opp mot kundens nettverk og integrasjoner."
+      "Strømforsyning / UPS": [
+        "Strømforsyning kontrollert",
+        "UPS/status vurdert",
+        "Alarm ved strømbrudd vurdert",
+        "Bytte anbefalt ved defekt"
       ],
-      "IP-DECT / telefoni|Funksjonstest": [
-        "IP-DECT/telefoni er funksjonstestet der dette var relevant.",
-        "Innkommende og utgående tale bør verifiseres ved behov.",
-        "Eventuelle deknings- eller registreringsavvik bør følges opp separat."
+      "Fjerndrift / tilgang": [
+        "Fjerntilgang testet",
+        "Tilgangsavvik beskrevet",
+        "Kundens IT må involveres ved behov",
+        "Begrensning for kontroll dokumentert"
       ],
-      "Fjerndrift / tilgang|Fjerndrift": [
-        "Fjerntilgang er kontrollert der dette var mulig.",
-        "Dersom fjerntilgang ikke fungerer, bør dette følges opp sammen med kundens IT.",
-        "Manglende tilgang kan begrense muligheten for full kontroll og videre feilsøking."
+      "Jira / saksoppfølging": [
+        "Saksnummer lagt inn",
+        "Status på sak beskrevet",
+        "Videre tiltak tydeliggjort",
+        "Ansvar/oppfølging avklart"
+      ],
+      "Annet": [
+        "Funn beskrevet",
+        "Konsekvens vurdert",
+        "Videre tiltak foreslått",
+        "Kunde informert"
       ]
     };
 
-    const genericSuggestions = [
-      "Ingen kritiske avvik observert på kontrolltidspunktet.",
-      "Kunde er informert om observasjonen og videre anbefalt oppfølging.",
-      "Forholdet anbefales fulgt opp dersom feilen oppstår på nytt.",
-      "Det er opprettet eller anbefalt egen sak for videre oppfølging."
-    ];
-
-    function getValue(id) {
+    function value(id) {
       const el = $(id);
-      if (!el) return "";
-      if (el.type === "checkbox") return el.checked;
-      return el.value.trim();
+      return el ? el.value.trim() : "";
     }
 
-    function setValue(id, value) {
-      const el = $(id);
-      if (!el) return;
-      if (el.type === "checkbox") el.checked = Boolean(value);
-      else el.value = value || "";
-    }
-
-    function showStatus(message, type = "") {
+    function setStatus(msg, type = "") {
       const box = $("statusBox");
-      box.className = "status-box";
-      if (type) box.classList.add(type);
-      box.textContent = message;
+      box.className = "status" + (type ? " " + type : "");
+      box.textContent = msg;
     }
 
-    function toast(message) {
-      const el = $("toast");
-      el.textContent = message;
-      el.classList.add("show");
-      setTimeout(() => el.classList.remove("show"), 1300);
-    }
-
-    function saveDraft() {
-      const data = {};
-      for (const id of allFields) {
-        const el = $(id);
-        if (!el) continue;
-        data[id] = el.type === "checkbox" ? el.checked : el.value;
-      }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    function loadDraft() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const data = JSON.parse(raw);
-        for (const [id, value] of Object.entries(data)) setValue(id, value);
-      } catch {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    }
-
-    function payloadForField(targetId) {
+    function context() {
       return {
-        mode: "single",
-        targetId,
-        sectionTitle: $(targetId).dataset.sectionTitle,
-        sectionText: getValue(targetId),
-        system: getValue("system"),
-        area: getValue("area"),
-        status: getValue("status"),
-        style: getValue("style"),
-        contact: getValue("contact"),
-        noNewFacts: getValue("noNewFacts"),
-        keepTechnical: getValue("keepTechnical"),
-        noSensitive: getValue("noSensitive")
+        system: value("system"),
+        area: value("area"),
+        status: value("status"),
+        style: value("style"),
+        contact: value("contact")
       };
     }
 
-    async function callApi(payload) {
-      const response = await fetch("/api/formulate", {
+    function payload(mode, fieldId) {
+      return {
+        mode,
+        fieldId,
+        sectionTitle: $(fieldId).dataset.title,
+        sectionText: value(fieldId),
+        allFields: collectFields(),
+        ...context()
+      };
+    }
+
+    function collectFields() {
+      const data = {};
+      for (const id of fields) data[id] = value(id);
+      return data;
+    }
+
+    async function callApi(body) {
+      const res = await fetch("/api/formulate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
       });
 
-      const raw = await response.text();
-      let result;
-      try {
-        result = JSON.parse(raw);
-      } catch {
-        result = { error: raw || "API svarte ikke med JSON." };
-      }
+      const raw = await res.text();
+      let data;
+      try { data = JSON.parse(raw); } catch { data = { error: raw }; }
 
-      if (!response.ok) {
-        throw new Error(result.error || result.message || `HTTP ${response.status}`);
-      }
-
-      return result;
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      return data;
     }
 
-    function setBusy(targetId, busy) {
-      document.querySelectorAll(`[data-target="${targetId}"]`).forEach(btn => btn.disabled = busy);
-      const btn = document.querySelector(`.generate-one[data-target="${targetId}"]`);
-      if (btn) btn.textContent = busy ? "Formulerer..." : "Generer forslag";
-    }
-
-    async function generateField(targetId) {
-      const payload = payloadForField(targetId);
-
-      if (!payload.sectionText && payload.status === "Ikke valgt") {
-        const ok = confirm("Feltet er tomt og status er ikke valgt. Velg helst status først for bedre forslag. Vil du fortsette?");
-        if (!ok) return;
-      }
-
-      previousValues[targetId] = getValue(targetId);
-      setBusy(targetId, true);
-      showStatus(`Sender feltet "${payload.sectionTitle}" til AI...`);
+    async function improve(fieldId) {
+      const btn = document.querySelector(`.improve[data-target="${fieldId}"]`);
+      const oldText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Jobber...";
+      setStatus(`Forbedrer feltet: ${$(fieldId).dataset.title}`);
 
       try {
-        const result = await callApi(payload);
-        setValue(targetId, (result.text || "").trim());
-        saveDraft();
-        showStatus("Ferdig. Forslaget er lagt inn i samme tekstboks.", "ok");
-        toast("Forslag lagt inn");
-      } catch (err) {
-        showStatus(`FEIL:\n${err.message}\n\nVanlige årsaker:\n- Du bruker GitHub Pages i stedet for Vercel-lenken\n- GITHUB_TOKEN mangler i Vercel\n- GITHUB_MODEL mangler i Vercel\n- Tokenet har ikke Models: Read-only\n- api/formulate.js ligger ikke riktig`, "error");
+        const data = await callApi(payload("rewrite", fieldId));
+        $(fieldId).value = data.text || "";
+        save();
+        updatePreview();
+        setStatus("Ferdig. Teksten er forbedret i samme felt.", "ok");
+      } catch (e) {
+        setStatus("Feil ved generering:\n" + e.message + "\n\nSjekk at du bruker Vercel-lenken, og at GITHUB_TOKEN/GITHUB_MODEL ligger i Vercel.", "err");
       } finally {
-        setBusy(targetId, false);
+        btn.disabled = false;
+        btn.textContent = oldText;
       }
     }
 
-    async function testAi() {
-      $("testAiBtn").disabled = true;
-      showStatus("Tester AI-tilkobling...");
+    async function missing(fieldId) {
+      const btn = document.querySelector(`.missing[data-target="${fieldId}"]`);
+      const box = $(`${fieldId}Suggestions`);
+      const oldText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Sjekker...";
+      setStatus(`Ser etter mulige manglende punkter for: ${$(fieldId).dataset.title}`);
 
       try {
-        const result = await callApi({
-          mode: "single",
-          sectionTitle: "OBSERVASJON",
-          sectionText: "Sjekket logg i NISM. Ikke noe kritisk.",
-          system: "TelecareIP / NISM (pasientvarsling)",
-          area: "Logg / hendelseslogg",
-          status: "Ingen avvik",
-          style: "kort",
-          contact: "",
-          noNewFacts: true,
-          keepTechnical: true,
-          noSensitive: true
-        });
-
-        showStatus(`AI fungerer.\n\nEksempelsvar:\n${result.text}`, "ok");
-      } catch (err) {
-        showStatus(`AI-test feilet:\n${err.message}\n\nSjekk Vercel → Settings → Environment Variables:\nGITHUB_TOKEN\nGITHUB_MODEL = openai/gpt-4.1-mini`, "error");
+        const data = await callApi(payload("missing", fieldId));
+        box.textContent = data.text || "Ingen forslag.";
+        box.classList.add("show");
+        setStatus("Forslag til manglende punkter er vist under feltet.", "ok");
+      } catch (e) {
+        setStatus("Feil ved sjekk av manglende punkter:\n" + e.message, "err");
       } finally {
-        $("testAiBtn").disabled = false;
+        btn.disabled = false;
+        btn.textContent = oldText;
       }
     }
 
-    function undoField(targetId) {
-      if (previousValues[targetId] === undefined) {
-        showStatus("Ingen tidligere tekst å angre til for dette feltet.", "error");
-        return;
-      }
-      setValue(targetId, previousValues[targetId]);
-      saveDraft();
-      toast("Angret");
-      showStatus("Feltet er satt tilbake til forrige tekst.", "ok");
-    }
-
-    function fullReport() {
-      const contact = getValue("contact");
-      const summaryTitle = contact
-        ? `OPPSUMMERING FRA KUNDESAMTALE MED: ${contact}`
-        : "OPPSUMMERING FRA KUNDESAMTALE MED:";
-
+    function reportText() {
+      const contact = value("contact");
       return [
-        summaryTitle,
-        getValue("summary"),
+        `OPPSUMMERING FRA KUNDESAMTALE MED:${contact ? " " + contact : ""}`,
+        value("summary"),
         "",
         "OPPDATERINGER OG OPPGRADERINGER:",
-        getValue("updates"),
+        value("updates"),
         "",
         "UTBEDRINGER OG ENDRINGER:",
-        getValue("fixes"),
+        value("fixes"),
         "",
         "OBSERVASJON:",
-        getValue("observation"),
+        value("observation"),
         "",
         "KONKLUSJON:",
-        getValue("conclusion")
+        value("conclusion")
       ].join("\n").replace(/\n{3,}/g, "\n\n").trim();
+    }
+
+    function updatePreview() {
+      $("reportPreview").value = reportText();
     }
 
     async function copyText(text) {
       if (!text.trim()) {
-        showStatus("Det er ingen tekst å kopiere.", "error");
+        setStatus("Ingen tekst å kopiere.", "err");
         return;
       }
       await navigator.clipboard.writeText(text);
-      toast("Kopiert");
-      showStatus("Teksten er kopiert.", "ok");
+      setStatus("Kopiert.", "ok");
     }
 
-    function updateHints() {
-      const key = `${getValue("system")}|${getValue("area")}`;
-      const items = suggestionMap[key] || genericSuggestions;
-      $("hintText").textContent = `${getValue("system")} → ${getValue("area")} → ${getValue("status")}`;
-
-      $("chips").innerHTML = "";
-      for (const item of items) {
-        const chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "chip";
-        chip.textContent = item;
-        chip.addEventListener("click", () => {
-          const current = getValue(activeTextareaId);
-          setValue(activeTextareaId, current ? `${current}\n${item}` : item);
-          saveDraft();
-          $(activeTextareaId).focus();
-          showStatus("Forslagspunkt lagt inn i aktiv tekstboks.", "ok");
+    function renderQuickPoints() {
+      const points = productPoints[value("system")] || productPoints["Annet"];
+      const box = $("quickPoints");
+      box.innerHTML = "";
+      for (const p of points) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = "+ " + p;
+        b.addEventListener("click", () => {
+          const active = document.activeElement && fields.includes(document.activeElement.id)
+            ? document.activeElement.id
+            : "observation";
+          const current = value(active);
+          $(active).value = current ? current + "\n" + p : p;
+          save();
+          updatePreview();
+          setStatus(`Punkt lagt til i ${$(active).dataset.title}.`, "ok");
         });
-        $("chips").appendChild(chip);
+        box.appendChild(b);
       }
     }
 
     function loadExample() {
-      setValue("contact", "Kari");
-      setValue("system", "TelecareIP / NISM (pasientvarsling)");
-      setValue("area", "Logg / hendelseslogg");
-      setValue("status", "Ingen avvik");
-      setValue("style", "kundevennlig");
+      $("contact").value = "Nordmann";
+      $("system").value = "TelecareIP / NISM - pasientvarsling";
+      $("area").value = "Logg / hendelseslogg";
+      $("status").value = "Ingen avvik";
+      $("style").value = "kunde";
 
-      setValue("summary", "Pasientvarsling fungerer som forventet og kunden hadde ingenting spesielt å melde.");
-      setValue("updates", "Ingen oppdatering eller oppgradering utført.");
-      setValue("fixes", "Ingen utbedringer eller endringer utført.");
-      setValue("observation", "Sjekket logg i NISM. Ikke noe kritisk. Noe gamle meldinger, men ikke noe som påvirker drift.");
-      setValue("conclusion", "Ingen kritiske feil. Pasientvarsling fungerer som forventet. Kunde var generelt fornøyd.");
+      $("summary").value = "Pasientvarsling fungerer som forventet og kunden hadde ingenting spesielt å melde.";
+      $("updates").value = "Ingen oppdatering eller oppgradering utført.";
+      $("fixes").value = "Ingen utbedringer eller endringer utført.";
+      $("observation").value = "Sjekket logg i NISM. Ikke noe kritisk. Noe gamle meldinger, men ikke noe som påvirker drift. Bør kanskje nevne Jira hvis sak opprettes.";
+      $("conclusion").value = "Ingen kritiske feil. Pasientvarsling fungerer som forventet. Kunde var generelt fornøyd.";
 
-      updateHints();
-      saveDraft();
-      toast("Eksempel lastet");
-      showStatus("Eksempel er lastet. Trykk nå Generer forslag på OBSERVASJON.", "ok");
+      save();
+      renderQuickPoints();
+      updatePreview();
+      setStatus("Eksempel lastet. Trykk “Forbedre tekst” eller “Mangler jeg noe?” på OBSERVASJON.", "ok");
     }
 
-    document.querySelectorAll(".generate-one").forEach(btn => {
-      btn.addEventListener("click", () => generateField(btn.dataset.target));
-    });
-
-    document.querySelectorAll(".undo-one").forEach(btn => {
-      btn.addEventListener("click", () => undoField(btn.dataset.target));
-    });
-
-    document.querySelectorAll(".copy-one").forEach(btn => {
-      btn.addEventListener("click", () => copyText(getValue(btn.dataset.target)));
-    });
-
-    for (const id of textFields) {
-      $(id).addEventListener("focus", () => activeTextareaId = id);
+    function save() {
+      const data = {
+        contact: value("contact"),
+        system: value("system"),
+        area: value("area"),
+        status: value("status"),
+        style: value("style"),
+        fields: collectFields()
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
-    $("copyReportBtn").addEventListener("click", () => copyText(fullReport()));
-    $("testAiBtn").addEventListener("click", testAi);
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        $("contact").value = data.contact || "";
+        $("system").value = data.system || $("system").value;
+        $("area").value = data.area || $("area").value;
+        $("status").value = data.status || $("status").value;
+        $("style").value = data.style || $("style").value;
+        for (const id of fields) $(id).value = data.fields?.[id] || "";
+      } catch {}
+    }
 
-    $("clearBtn").addEventListener("click", () => {
-      if (!confirm("Vil du tømme alle feltene?")) return;
-      for (const id of ["contact", ...textFields]) setValue(id, "");
-      localStorage.removeItem(STORAGE_KEY);
-      toast("Tømt");
-      showStatus("Feltene er tømt.", "ok");
-    });
+    document.querySelectorAll(".improve").forEach(b => b.addEventListener("click", () => improve(b.dataset.target)));
+    document.querySelectorAll(".missing").forEach(b => b.addEventListener("click", () => missing(b.dataset.target)));
+    document.querySelectorAll(".copy").forEach(b => b.addEventListener("click", () => copyText(value(b.dataset.target))));
 
     $("exampleBtn").addEventListener("click", loadExample);
+    $("copyReport").addEventListener("click", () => copyText(reportText()));
+    $("copyReportTop").addEventListener("click", () => copyText(reportText()));
+    $("refreshPreview").addEventListener("click", () => { updatePreview(); setStatus("Forhåndsvisning oppdatert.", "ok"); });
+    $("clearAll").addEventListener("click", () => {
+      if (!confirm("Tømme alle felt?")) return;
+      $("contact").value = "";
+      for (const id of fields) $(id).value = "";
+      localStorage.removeItem(STORAGE_KEY);
+      updatePreview();
+      setStatus("Feltene er tømt.", "ok");
+    });
 
-    for (const id of allFields) {
-      const el = $(id);
-      if (!el) continue;
-      el.addEventListener("input", saveDraft);
-      el.addEventListener("change", () => {
-        saveDraft();
-        if (["system", "area", "status"].includes(id)) updateHints();
-      });
-    }
+    ["contact", "system", "area", "status", "style", ...fields].forEach(id => {
+      $(id).addEventListener("input", () => { save(); updatePreview(); });
+      $(id).addEventListener("change", () => { save(); renderQuickPoints(); updatePreview(); });
+    });
 
-    loadDraft();
-    updateHints();
+    load();
+    renderQuickPoints();
+    updatePreview();
   </script>
 </body>
 </html>
