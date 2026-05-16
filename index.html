@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rapporthjelper – Årlig kontroll</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Rapporthjelper</p>
+      <h1>Årlig kontroll – formulering av rapportfelt</h1>
+      <p class="subtitle">Skriv råtekst i ett felt, velg system/område/status, og trykk <strong>Generer forslag</strong>. Forslaget kommer tilbake i samme boks.</p>
+    </div>
+    <div class="badge">GitHub Models + Vercel</div>
+  </header>
+
+  <main class="layout">
+    <section class="card context-card">
+      <div class="header-row">
+        <h2>1. Kontekst for formulering</h2>
+        <button id="exampleBtn" class="small">Last eksempel</button>
+      </div>
+
+      <div class="grid grid-four">
+        <label>System
+          <select id="system">
+            <option>TelecareIP / NISM (pasientvarsling)</option>
+            <option>AWS / AWA View</option>
+            <option>Unite / Ascom-system</option>
+            <option>IP-DECT / telefoni</option>
+            <option>Myco-telefoner</option>
+            <option>Posisjonssendere / smykker</option>
+            <option>Fjerndrift / tilgang</option>
+            <option>Annet</option>
+          </select>
+        </label>
+
+        <label>Område
+          <select id="area">
+            <option>Logg / hendelseslogg</option>
+            <option>Kundesamtale</option>
+            <option>NISM GUI / statusbilde</option>
+            <option>Backup</option>
+            <option>Software-versjon</option>
+            <option>Hardware / EOL / EOS</option>
+            <option>Funksjonstest</option>
+            <option>Varsling / alarmflyt</option>
+            <option>Smykker / beboerutstyr</option>
+            <option>Rom / lokasjon</option>
+            <option>Fjerndrift</option>
+            <option>Oppgradering</option>
+            <option>Utbedring</option>
+            <option>Anbefalt tiltak</option>
+          </select>
+        </label>
+
+        <label>Status
+          <select id="status">
+            <option>Ikke valgt</option>
+            <option>Ingen avvik</option>
+            <option>Mindre avvik</option>
+            <option>Kritisk avvik</option>
+            <option>Ikke utført</option>
+            <option>Ikke del av løsning</option>
+            <option>Krever oppfølging</option>
+            <option>JIRA-sak opprettet</option>
+            <option>Kunde informert</option>
+          </select>
+        </label>
+
+        <label>Formulering
+          <select id="style">
+            <option value="kundevennlig">Kundevennlig</option>
+            <option value="kort">Kort og presis</option>
+            <option value="teknisk">Mer teknisk</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="suggestion-panel">
+        <div>
+          <h3>Forslagspunkter basert på valgt kontekst</h3>
+          <p id="hintText">Velg system, område og status for å få relevante punkter.</p>
+        </div>
+        <div id="chips" class="chips"></div>
+      </div>
+    </section>
+
+    <section class="card fields-card">
+      <div class="header-row">
+        <h2>2. Rapportfelt</h2>
+        <span class="muted">Generer ett felt om gangen</span>
+      </div>
+
+      <div class="field-block">
+        <label class="field-title">OPPSUMMERING FRA KUNDESAMTALE MED:</label>
+        <input id="contact" class="contact-input" placeholder="F.eks. Kari" />
+        <textarea id="summary" data-section-title="OPPSUMMERING FRA KUNDESAMTALE" placeholder="Skriv råtekst fra kundesamtalen her..."></textarea>
+        <div class="field-actions"><button class="primary generate-one" data-target="summary">Generer forslag</button><button class="undo-one" data-target="summary">Angre</button><button class="copy-one" data-target="summary">Kopier felt</button></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-title">OPPDATERINGER OG OPPGRADERINGER:</label>
+        <textarea id="updates" data-section-title="OPPDATERINGER OG OPPGRADERINGER" placeholder="F.eks. Ingen oppdatering eller oppgradering utført."></textarea>
+        <div class="field-actions"><button class="primary generate-one" data-target="updates">Generer forslag</button><button class="undo-one" data-target="updates">Angre</button><button class="copy-one" data-target="updates">Kopier felt</button></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-title">UTBEDRINGER OG ENDRINGER:</label>
+        <textarea id="fixes" data-section-title="UTBEDRINGER OG ENDRINGER" placeholder="F.eks. Ingen utbedringer eller endringer utført."></textarea>
+        <div class="field-actions"><button class="primary generate-one" data-target="fixes">Generer forslag</button><button class="undo-one" data-target="fixes">Angre</button><button class="copy-one" data-target="fixes">Kopier felt</button></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-title">OBSERVASJON:</label>
+        <textarea id="observation" data-section-title="OBSERVASJON" placeholder="Skriv tekniske observasjoner, romnummer, logger, test, saksnummer osv..."></textarea>
+        <div class="field-actions"><button class="primary generate-one" data-target="observation">Generer forslag</button><button class="undo-one" data-target="observation">Angre</button><button class="copy-one" data-target="observation">Kopier felt</button></div>
+      </div>
+
+      <div class="field-block">
+        <label class="field-title">KONKLUSJON:</label>
+        <textarea id="conclusion" data-section-title="KONKLUSJON" placeholder="Skriv foreløpig konklusjon eller stikkord..."></textarea>
+        <div class="field-actions"><button class="primary generate-one" data-target="conclusion">Generer forslag</button><button class="undo-one" data-target="conclusion">Angre</button><button class="copy-one" data-target="conclusion">Kopier felt</button></div>
+      </div>
+    </section>
+
+    <aside class="card side-card">
+      <h2>3. Hele rapporten</h2>
+      <p class="note">Når feltene er formulert ferdig, kan du kopiere hele rapporten i riktig rekkefølge.</p>
+      <button id="copyReportBtn" class="primary">Kopier hele rapporten</button>
+      <button id="clearBtn" class="danger">Tøm alt</button>
+      <hr />
+      <label class="check"><input id="noNewFacts" type="checkbox" checked />Ikke legg til ny informasjon</label>
+      <label class="check"><input id="keepTechnical" type="checkbox" checked />Behold saksnummer, romnummer og systemnavn</label>
+      <label class="check"><input id="noSensitive" type="checkbox" checked />Unngå person-/helseopplysninger</label>
+      <p class="privacy">Bruk tekniske beskrivelser, romnummer, saksnummer og systemstatus. Ikke lim inn sensitive personopplysninger.</p>
+    </aside>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
