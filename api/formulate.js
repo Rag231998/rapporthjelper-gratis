@@ -13,47 +13,28 @@ function styleInstruction(style) {
   if (style === "kort") return "Skriv kort, presist og uten unødvendig fylltekst.";
   if (style === "teknisk") return "Skriv mer teknisk, men fortsatt forståelig for kunde.";
   if (style === "tydelig") return "Skriv tydelig med vekt på anbefalt tiltak, ansvar og videre oppfølging.";
-  return "Skriv kundevennlig, profesjonelt og nøkternt.";
+  return "Skriv kundevennlig, profesjonelt, nøkternt og egnet for rapport til kunde.";
 }
 
 function ascomContext(system) {
   const s = clean(system).toLowerCase();
-
   const base = [
-    "Ascom leverer løsninger for virksomhetskritisk kommunikasjon, Healthcare ICT, pasientvarsling, alarmhåndtering, mobile enheter, meldingsflyt og arbeidsflyt i tidssensitive miljøer.",
-    "Rapporten skal være egnet for kunde og skal ikke overdrive, spekulere eller legge til fakta som ikke er oppgitt."
+    "Ascom leverer løsninger for virksomhetskritisk kommunikasjon, pasientvarsling, alarmhåndtering, mobile enheter, meldingsflyt og arbeidsflyt i tidssensitive miljøer.",
+    "Rapporten skal være faktabasert og kundevennlig. Ikke overdriv og ikke legg til fakta som ikke er oppgitt."
   ];
 
   if (s.includes("telecare") || s.includes("nism") || s.includes("pasientvarsling")) {
     base.push("Relevant kontekst: teleCARE IP/NISM, pasientvarsling, sentrale moduler, rom/enheter, smykker, posisjon, alarmflyt, logger, backup, fjerndrift og Jira ved videre oppfølging.");
   }
-  if (s.includes("telligence")) {
-    base.push("Relevant kontekst: Telligence, pasientvarsling, alarmflyt, rom/enheter og funksjonstest.");
-  }
-  if (s.includes("unite")) {
-    base.push("Relevant kontekst: Unite, meldingsruting, alarmhåndtering, distribusjonslogg, integrasjoner, mobile enheter og server/plattform.");
-  }
-  if (s.includes("awa")) {
-    base.push("Relevant kontekst: AWA View, visning, alarmflyt, mottakergrupper og oppdatering av statusbilde.");
-  }
-  if (s.includes("myco")) {
-    base.push("Relevant kontekst: Myco, mobile enheter, mottak av varsler, batteri/lading, stikkprøve og eventuell reparasjon/logistikk.");
-  }
-  if (s.includes("dect") || s.includes("vowifi")) {
-    base.push("Relevant kontekst: trådløs telefoni, basestasjoner, dekning, registrering og inn-/utgående tale.");
-  }
-  if (s.includes("posisjon") || s.includes("smykker")) {
-    base.push("Relevant kontekst: posisjonssendere/smykker, offline/aktive enheter, lokasjon, batteristatus og videre tiltak.");
-  }
-  if (s.includes("strøm") || s.includes("ups")) {
-    base.push("Relevant kontekst: strømforsyning, UPS, driftssikkerhet, strømbruddsalarm og behov for bytte ved defekt.");
-  }
-  if (s.includes("fjerndrift")) {
-    base.push("Relevant kontekst: fjerntilgang, VPN/portal, kundens IT, tilgangsbegrensninger og konsekvens for kontroll/feilsøking.");
-  }
-  if (s.includes("jira")) {
-    base.push("Relevant kontekst: Jira/saksoppfølging, saksnummer, videre tiltak, ansvar og kundens beslutning.");
-  }
+  if (s.includes("telligence")) base.push("Relevant kontekst: Telligence, pasientvarsling, alarmflyt, rom/enheter og funksjonstest.");
+  if (s.includes("unite")) base.push("Relevant kontekst: Unite, meldingsruting, alarmhåndtering, distribusjonslogg, integrasjoner, mobile enheter og server/plattform.");
+  if (s.includes("awa")) base.push("Relevant kontekst: AWA View, visning, alarmflyt, mottakergrupper og oppdatering av statusbilde.");
+  if (s.includes("myco")) base.push("Relevant kontekst: Myco, mobile enheter, mottak av varsler, batteri/lading, stikkprøve og eventuell reparasjon/logistikk.");
+  if (s.includes("dect") || s.includes("vowifi")) base.push("Relevant kontekst: trådløs telefoni, basestasjoner, dekning, registrering og inn-/utgående tale.");
+  if (s.includes("posisjon") || s.includes("smykker")) base.push("Relevant kontekst: posisjonssendere/smykker, offline/aktive enheter, lokasjon, batteristatus og videre tiltak.");
+  if (s.includes("strøm") || s.includes("ups")) base.push("Relevant kontekst: strømforsyning, UPS, driftssikkerhet, strømbruddsalarm og behov for bytte ved defekt.");
+  if (s.includes("fjerndrift")) base.push("Relevant kontekst: fjerntilgang, VPN/portal, kundens IT, tilgangsbegrensninger og konsekvens for kontroll/feilsøking.");
+  if (s.includes("jira")) base.push("Relevant kontekst: Jira/saksoppfølging, saksnummer, videre tiltak, ansvar og kundens beslutning.");
 
   return base.join("\n");
 }
@@ -82,9 +63,9 @@ Observasjon: ${clean(f.observation)}
 Konklusjon: ${clean(f.conclusion)}
 Mulige konsekvenser: ${clean(f.consequences)}
 
+Sjekkliste: ${JSON.stringify(d.checklist || [])}
 Kritiske tiltak: ${JSON.stringify(d.critical || [])}
 Anbefalte tiltak: ${JSON.stringify(d.recommended || [])}
-Sjekkliste: ${JSON.stringify(d.checklist || [])}
 `;
 }
 
@@ -96,13 +77,12 @@ ${styleInstruction(c.styleChoice)}
 Skriv på norsk bokmål.
 Ikke skriv at du er AI.
 Ikke legg til fakta som ikke er oppgitt.
-Ikke finn på romnummer, saksnummer, dato, målinger, tester eller navn.
-Bruk "kunde", "anlegget", "systemet" eller "kontaktperson" der det passer.
+Ikke finn på romnummer, saksnummer, datoer, målinger, tester eller navn.
 Ikke bruk navnet Kari. Dersom eksempelnavn trengs, bruk Nordmann.
 Behold tekniske navn som NISM, teleCARE IP, Telligence, Unite, AWA View, Myco, IP-DECT, DECT, VoWiFi, UPS, Jira, romnummer og saksnummer.
 Unngå sensitive personopplysninger og helseopplysninger.
 Hvis Jira ikke er nevnt, men videre oppfølging er relevant, formuler forsiktig: "Det bør vurderes om forholdet skal følges opp i Jira-sak" - ikke skriv at sak er opprettet.
-Hvis kunde må ta stilling til tiltak, formuler det tydelig uten å legge skyld på kunde.
+Hvis kunden må ta stilling til tiltak, formuler det tydelig uten å legge skyld på kunde.
 ${ascomContext(c.system)}
 `;
 }
@@ -135,24 +115,101 @@ ${text || "(tomt felt)"}`;
     return `${rules}
 
 OPPGAVE:
-Du skal lage tekst som automatisk kan legges til nederst i rapportfeltet "${title}".
-Teksten skal IKKE gjenta det som allerede står.
-Den skal kun dekke viktige ting som bør vurderes, basert på rapportmalen og konteksten.
-
-Viktig:
-- Ikke skriv "mangler" eller "du har glemt".
-- Ikke finn på at Jira-sak er opprettet.
-- Hvis Jira/saksoppfølging ikke er nevnt og oppfølging kan være relevant, legg til en forsiktig setning om at det bør vurderes om forholdet skal følges opp i Jira-sak.
-- Hvis kunde bør informeres/avklare tiltak, skriv det forsiktig.
-- Hvis feltet allerede er godt nok, svar med tom streng.
-
-Svar som 1-3 korte setninger eller korte punktlinjer som kan limes direkte inn i feltet.
+Lag tekst som kan legges til nederst i feltet "${title}".
+Teksten skal ikke gjenta det som allerede står.
+Den skal dekke viktige punkter som bør vurderes basert på rapportmalen og konteksten.
+Ikke skriv "mangler" eller "du har glemt".
+Ikke finn på at Jira-sak er opprettet.
+Hvis Jira/saksoppfølging ikke er nevnt og oppfølging kan være relevant, legg til en forsiktig setning om at det bør vurderes om forholdet skal følges opp i Jira-sak.
+Hvis feltet allerede er godt nok, svar med tom streng.
+Svar med 1-3 korte setninger eller punktlinjer som kan limes direkte inn.
 
 RAPPORTKONTEKST:
 ${summary}
 
-EKSISTERENDE TEKST I FELTET:
+EKSISTERENDE TEKST:
 ${text || "(tomt felt)"}`;
+  }
+
+  if (mode === "rewrite_check_comment") {
+    return `${rules}
+
+OPPGAVE:
+Forbedre kommentaren til dette sjekklistepunktet.
+Svar kun med kort kommentar som passer i kommentarfeltet.
+Ikke ta med overskrift.
+
+Sjekklistepunkt: ${clean(data.checklistItem)}
+Status: ${clean(data.checklistStatus) || "ikke valgt"}
+Eksisterende kommentar: ${text || "(tom kommentar)"}
+
+RAPPORTKONTEKST:
+${summary}`;
+  }
+
+  if (mode === "suggest_checklist_comments") {
+    return `${rules}
+
+OPPGAVE:
+Lag korte kommentarer til sjekklistepunkter som mangler kommentar, basert på status og rapporttekst.
+Returner gyldig JSON-objekt der nøkkel er eksakt sjekklistepunkt og verdi er kommentar.
+Ikke lag kommentar for punkter der status er tom, med mindre rapporten tydelig omtaler punktet.
+Kommentar skal være kort og egnet for kunde.
+
+RAPPORT:
+${summary}
+
+SJEKKLISTEPUNKTER:
+${JSON.stringify(data.checklistItems || [])}`;
+  }
+
+  if (mode === "rewrite_action") {
+    const kind = clean(data.actionType) === "critical" ? "kritisk tiltak" : "anbefalt tiltak";
+    return `${rules}
+
+OPPGAVE:
+Forbedre denne teksten til et ${kind}.
+Svar kun med én ferdig tekstlinje. Ikke ta med nummer eller overskrift.
+Gjør tiltaket konkret, kundevennlig og handlingsrettet.
+Ikke legg til nye fakta.
+
+Tiltakstekst:
+${text || "(tomt felt)"}
+
+RAPPORT:
+${summary}`;
+  }
+
+  if (mode === "polish_actions") {
+    const prefix = clean(data.actionType);
+    const rows = prefix === "critical" ? (reportData.critical || []) : (reportData.recommended || []);
+    return `${rules}
+
+OPPGAVE:
+Forbedre tiltakstekstene under. Returner maks 5 nummererte linjer.
+Ikke legg til nye tiltak som ikke finnes i teksten.
+Hopp over tomme tiltak.
+Gjør hvert tiltak konkret, kundevennlig og handlingsrettet.
+
+Tiltak:
+${JSON.stringify(rows)}
+
+RAPPORT:
+${summary}`;
+  }
+
+  if (mode === "suggest_recommended") {
+    return `${rules}
+
+OPPGAVE:
+Foreslå 1-5 anbefalte tiltak basert på observasjon, sjekkliste og konklusjon.
+Ikke finn på tekniske funn.
+Bruk bare tiltak som følger naturlig av det som er skrevet.
+Hvis det er lite informasjon, gi generelle og forsiktige anbefalinger.
+Returner nummerert liste uten overskrift.
+
+RAPPORT:
+${summary}`;
   }
 
   if (mode === "make_conclusion") {
@@ -167,50 +224,6 @@ Nevn om årlig kontroll er gjennomført, generell status, eventuelle avvik/tilta
 
 RAPPORT:
 ${summary}`;
-  }
-
-  if (mode === "polish_critical" || mode === "polish_recommended") {
-    return `${rules}
-
-OPPGAVE:
-Forbedre tiltakstekstene under. Returner maks 5 nummererte linjer.
-Ikke legg til nye tiltak som ikke finnes i teksten.
-Gjør hvert tiltak konkret, kundevennlig og handlingsrettet.
-
-RAPPORT:
-${summary}
-
-TILTAK:
-${clean(data.sectionText)}`;
-  }
-
-  if (mode === "suggest_recommended") {
-    return `${rules}
-
-OPPGAVE:
-Foreslå 1-5 anbefalte tiltak basert på observasjon, utbedringer, konklusjon og sjekkliste.
-Ikke finn på tekniske funn. Bruk bare tiltak som følger naturlig av det som er skrevet.
-Hvis det er lite informasjon, gi generelle og forsiktige anbefalinger.
-Returner nummerert liste uten overskrift.
-
-RAPPORT:
-${summary}`;
-  }
-
-  if (mode === "checklist_comments") {
-    return `${rules}
-
-OPPGAVE:
-Lag korte kommentarer til sjekklistepunkter som mangler kommentar, basert på status og rapporttekst.
-Returner gyldig JSON-objekt der nøkkel er eksakt sjekklistepunkt og verdi er kommentar.
-Kommentar skal være kort og egnet for kunde.
-Ikke lag kommentar for punkter der status er tom, med mindre rapporten tydelig omtaler punktet.
-
-RAPPORT:
-${summary}
-
-SJEKKLISTEPUNKTER:
-${JSON.stringify(data.checklistItems || [])}`;
   }
 
   if (mode === "full_review") {
@@ -232,7 +245,7 @@ ${summary}`;
   return `${rules}
 
 OPPGAVE:
-Skriv en kundevennlig rapporttekst basert på dette:
+Skriv kundevennlig rapporttekst basert på rapporten:
 ${summary}`;
 }
 
@@ -284,7 +297,7 @@ module.exports = async function handler(req, res) {
 
     const content = result?.choices?.[0]?.message?.content || "";
 
-    if (data.mode === "checklist_comments") {
+    if (data.mode === "suggest_checklist_comments") {
       try {
         const cleaned = content.replace(/^```json/i, "").replace(/^```/i, "").replace(/```$/i, "").trim();
         const comments = JSON.parse(cleaned);
