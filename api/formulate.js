@@ -9,192 +9,182 @@ function parseBody(req) {
   return req.body || {};
 }
 
-function styleInstruction(style) {
-  if (style === "kort") return "Skriv kort, presist og uten unødvendig fylltekst.";
-  if (style === "teknisk") return "Skriv mer teknisk, men fortsatt forståelig for kunde.";
-  if (style === "tydelig") return "Skriv tydelig med vekt på anbefalt tiltak, ansvar og videre oppfølging.";
-  return "Skriv kundevennlig, profesjonelt, nøkternt og egnet for rapport til kunde.";
-}
-
-function ascomContext(system) {
-  const s = clean(system).toLowerCase();
-  const base = [
-    "Ascom leverer løsninger for virksomhetskritisk kommunikasjon, pasientvarsling, alarmhåndtering, mobile enheter, meldingsflyt og arbeidsflyt i tidssensitive miljøer.",
-    "Rapporten skal være faktabasert og kundevennlig. Ikke overdriv og ikke legg til fakta som ikke er oppgitt."
-  ];
-
-  if (s.includes("telecare") || s.includes("nism") || s.includes("pasientvarsling")) {
-    base.push("Relevant kontekst: teleCARE IP/NISM, pasientvarsling, sentrale moduler, rom/enheter, smykker, posisjon, alarmflyt, logger, backup, fjerndrift og Jira ved videre oppfølging.");
-  }
-  if (s.includes("telligence")) base.push("Relevant kontekst: Telligence, pasientvarsling, alarmflyt, rom/enheter og funksjonstest.");
-  if (s.includes("unite")) base.push("Relevant kontekst: Unite, meldingsruting, alarmhåndtering, distribusjonslogg, integrasjoner, mobile enheter og server/plattform.");
-  if (s.includes("awa")) base.push("Relevant kontekst: AWA View, visning, alarmflyt, mottakergrupper og oppdatering av statusbilde.");
-  if (s.includes("myco")) base.push("Relevant kontekst: Myco, mobile enheter, mottak av varsler, batteri/lading, stikkprøve og eventuell reparasjon/logistikk.");
-  if (s.includes("dect") || s.includes("vowifi")) base.push("Relevant kontekst: trådløs telefoni, basestasjoner, dekning, registrering og inn-/utgående tale.");
-  if (s.includes("posisjon") || s.includes("smykker")) base.push("Relevant kontekst: posisjonssendere/smykker, offline/aktive enheter, lokasjon, batteristatus og videre tiltak.");
-  if (s.includes("strøm") || s.includes("ups")) base.push("Relevant kontekst: strømforsyning, UPS, driftssikkerhet, strømbruddsalarm og behov for bytte ved defekt.");
-  if (s.includes("fjerndrift")) base.push("Relevant kontekst: fjerntilgang, VPN/portal, kundens IT, tilgangsbegrensninger og konsekvens for kontroll/feilsøking.");
-  if (s.includes("jira")) base.push("Relevant kontekst: Jira/saksoppfølging, saksnummer, videre tiltak, ansvar og kundens beslutning.");
-
-  return base.join("\n");
-}
-
-function reportSummary(reportData) {
-  const d = reportData || {};
-  const c = d.context || {};
+function reportSummary(d) {
+  d = d || {};
   const f = d.fields || {};
+  const m = d.meta || {};
 
   return `
-KONTEKSTVALG
-System/produkt: ${clean(c.system)}
-Kontrollpunkt: ${clean(c.controlPoint)}
-Status: ${clean(c.statusChoice)}
-Stil: ${clean(c.styleChoice)}
-Kontaktperson: ${clean(c.contactName) || "ikke oppgitt"}
-Oppdateringer avtalt med: ${clean(c.updatesAgreed) || "ikke oppgitt"}
-Utbedringer avtalt med: ${clean(c.fixesAgreed) || "ikke oppgitt"}
-Oppfølging: ${clean(c.followUp) || "ikke valgt"}
+Kontaktperson: ${clean(m.contactName) || "ikke oppgitt"}
+Oppdateringer avtalt med: ${clean(m.updatesAgreed) || "ikke oppgitt"}
+Oppdateringsmerknad: ${clean(m.updatesNote)}
+Utbedringer avtalt med: ${clean(m.fixesAgreed) || "ikke oppgitt"}
+Utbedringsmerknad: ${clean(m.fixesNote)}
 
-RAPPORTFELT
-Oppsummering: ${clean(f.summary)}
-Oppdateringer: ${clean(f.updates)}
-Utbedringer: ${clean(f.fixes)}
-Observasjon: ${clean(f.observation)}
-Konklusjon: ${clean(f.conclusion)}
-Mulige konsekvenser: ${clean(f.consequences)}
+OPPSUMMERING:
+${clean(f.summary)}
 
-Sjekkliste: ${JSON.stringify(d.checklist || [])}
-Kritiske tiltak: ${JSON.stringify(d.critical || [])}
-Anbefalte tiltak: ${JSON.stringify(d.recommended || [])}
+OPPDATERINGER:
+${clean(f.updates)}
+
+UTBEDRINGER:
+${clean(f.fixes)}
+
+OBSERVASJON:
+${clean(f.observation)}
+
+SJEKKLISTE:
+${JSON.stringify(d.checklist || [])}
+
+KONKLUSJON:
+${clean(f.conclusion)}
+
+KRITISKE TILTAK:
+${JSON.stringify(d.critical || [])}
+
+MULIGE KONSEKVENSER:
+${clean(f.consequences)}
+
+ANBEFALTE TILTAK:
+${JSON.stringify(d.recommended || [])}
 `;
 }
 
-function baseRules(reportData) {
-  const c = (reportData || {}).context || {};
+function baseRules() {
   return `
 Du er en norsk rapportassistent for Ascom-teknikere som skriver kunderapport etter årlig kontroll.
-${styleInstruction(c.styleChoice)}
-Skriv på norsk bokmål.
-Ikke skriv at du er AI.
-Ikke legg til fakta som ikke er oppgitt.
-Ikke finn på romnummer, saksnummer, datoer, målinger, tester eller navn.
-Ikke bruk navnet Kari. Dersom eksempelnavn trengs, bruk Nordmann.
-Behold tekniske navn som NISM, teleCARE IP, Telligence, Unite, AWA View, Myco, IP-DECT, DECT, VoWiFi, UPS, Jira, romnummer og saksnummer.
-Unngå sensitive personopplysninger og helseopplysninger.
-Hvis Jira ikke er nevnt, men videre oppfølging er relevant, formuler forsiktig: "Det bør vurderes om forholdet skal følges opp i Jira-sak" - ikke skriv at sak er opprettet.
-Hvis kunden må ta stilling til tiltak, formuler det tydelig uten å legge skyld på kunde.
-${ascomContext(c.system)}
+
+Kontekst:
+Ascom jobber med virksomhetskritisk kommunikasjon og løsninger som pasientvarsling, teleCARE IP/NISM, Telligence, Unite, AWA View, Myco, IP-DECT/DECT, VoWiFi, posisjonssendere/smykker, strømforsyning/UPS, fjerndrift, logger, backup, meldingsflyt, alarmflyt og Jira/saksoppfølging.
+
+Regler:
+- Skriv på norsk bokmål.
+- Skriv kundevennlig, profesjonelt og nøkternt.
+- Svar kun med ferdig tekst som kan stå direkte i rapportfeltet, med mindre oppgaven ber om kvalitetssjekk.
+- Ikke skriv at du er AI.
+- Ikke legg til fakta som ikke er oppgitt.
+- Ikke finn på saksnummer, romnummer, datoer, målinger, tester eller navn.
+- Ikke bruk navnet Kari. Hvis eksempelnavn trengs, bruk Nordmann.
+- Behold tekniske navn som NISM, teleCARE IP, Telligence, Unite, AWA View, Myco, IP-DECT, DECT, VoWiFi, UPS og Jira.
+- Unngå sensitive personopplysninger og helseopplysninger.
+- Hvis videre oppfølging er relevant og Jira ikke er nevnt, skriv forsiktig at det bør vurderes om forholdet skal følges opp i Jira-sak.
+- Ikke skriv at sak er opprettet hvis det ikke er oppgitt.
+- Ikke overdriv alvorlighetsgrad.
+- Ikke bruk for mye pyntespråk.
 `;
 }
 
 function buildPrompt(data) {
   const mode = clean(data.mode);
-  const reportData = data.reportData || {};
   const title = clean(data.sectionTitle);
   const text = clean(data.sectionText);
-  const rules = baseRules(reportData);
-  const summary = reportSummary(reportData);
+  const summary = reportSummary(data.reportData);
+  const rules = baseRules();
 
-  if (mode === "rewrite_field") {
+  if (mode === "rewrite") {
     return `${rules}
 
 OPPGAVE:
-Omformuler kun dette rapportfeltet slik at det kan limes direkte inn i feltet "${title}".
+Omformuler råteksten i feltet "${title}" til en ferdig rapporttekst.
+Du skal gjøre dette på samme måte som når en tekniker limer inn råtekst og ber om bedre formulering.
 Ikke ta med overskrift.
 Ikke endre fakta.
-Gjør teksten bedre, roligere, mer profesjonell og egnet for kunde.
+Ikke legg til nye detaljer som ikke er oppgitt.
 
-RAPPORTKONTEKST:
-${summary}
+RÅTEKST:
+${text || "(tomt felt)"}
 
-RÅTEKST I FELTET:
-${text || "(tomt felt)"}`;
+HELE RAPPORTEN SOM KONTEKST:
+${summary}`;
   }
 
-  if (mode === "append_missing") {
+  if (mode === "append") {
     return `${rules}
 
 OPPGAVE:
-Lag tekst som kan legges til nederst i feltet "${title}".
-Teksten skal ikke gjenta det som allerede står.
-Den skal dekke viktige punkter som bør vurderes basert på rapportmalen og konteksten.
-Ikke skriv "mangler" eller "du har glemt".
-Ikke finn på at Jira-sak er opprettet.
-Hvis Jira/saksoppfølging ikke er nevnt og oppfølging kan være relevant, legg til en forsiktig setning om at det bør vurderes om forholdet skal følges opp i Jira-sak.
-Hvis feltet allerede er godt nok, svar med tom streng.
-Svar med 1-3 korte setninger eller punktlinjer som kan limes direkte inn.
+Les feltet "${title}" og hele rapporten.
+Lag 1-3 korte, relevante setninger som kan legges til nederst i samme felt uten å slette eksisterende tekst.
+Du skal særlig vurdere om noe bør nevnes om:
+- videre oppfølging
+- Jira/saksoppfølging
+- avklaring med kunde/IT
+- dokumentasjon
+- kontrollpunkt som naturlig henger sammen med teksten
 
-RAPPORTKONTEKST:
-${summary}
+Ikke gjenta det som allerede står.
+Ikke finn på fakta.
+Hvis det ikke er noe relevant å legge til, svar med tom tekst.
 
 EKSISTERENDE TEKST:
-${text || "(tomt felt)"}`;
+${text || "(tomt felt)"}
+
+HELE RAPPORTEN:
+${summary}`;
   }
 
-  if (mode === "rewrite_check_comment") {
+  if (mode === "check_comment") {
     return `${rules}
 
 OPPGAVE:
 Forbedre kommentaren til dette sjekklistepunktet.
-Svar kun med kort kommentar som passer i kommentarfeltet.
+Svar kun med én kort og kundevennlig kommentar som kan stå i kommentarfeltet.
 Ikke ta med overskrift.
 
-Sjekklistepunkt: ${clean(data.checklistItem)}
+Sjekkpunkt: ${clean(data.checklistName)}
 Status: ${clean(data.checklistStatus) || "ikke valgt"}
-Eksisterende kommentar: ${text || "(tom kommentar)"}
+Kommentar:
+${text || "(tom kommentar)"}
 
-RAPPORTKONTEKST:
+HELE RAPPORTEN:
 ${summary}`;
   }
 
-  if (mode === "suggest_checklist_comments") {
+  if (mode === "action") {
     return `${rules}
 
 OPPGAVE:
-Lag korte kommentarer til sjekklistepunkter som mangler kommentar, basert på status og rapporttekst.
-Returner gyldig JSON-objekt der nøkkel er eksakt sjekklistepunkt og verdi er kommentar.
-Ikke lag kommentar for punkter der status er tom, med mindre rapporten tydelig omtaler punktet.
-Kommentar skal være kort og egnet for kunde.
-
-RAPPORT:
-${summary}
-
-SJEKKLISTEPUNKTER:
-${JSON.stringify(data.checklistItems || [])}`;
-  }
-
-  if (mode === "rewrite_action") {
-    const kind = clean(data.actionType) === "critical" ? "kritisk tiltak" : "anbefalt tiltak";
-    return `${rules}
-
-OPPGAVE:
-Forbedre denne teksten til et ${kind}.
-Svar kun med én ferdig tekstlinje. Ikke ta med nummer eller overskrift.
-Gjør tiltaket konkret, kundevennlig og handlingsrettet.
+Forbedre tiltaksteksten.
+Svar kun med én ferdig tiltakstekst, uten nummer og uten overskrift.
+Gjør teksten konkret, kundevennlig og handlingsrettet.
 Ikke legg til nye fakta.
 
-Tiltakstekst:
+Felt: ${title}
+Tekst:
 ${text || "(tomt felt)"}
 
-RAPPORT:
+HELE RAPPORTEN:
 ${summary}`;
   }
 
-  if (mode === "polish_actions") {
-    const prefix = clean(data.actionType);
-    const rows = prefix === "critical" ? (reportData.critical || []) : (reportData.recommended || []);
+  if (mode === "fill_checklist") {
     return `${rules}
 
 OPPGAVE:
-Forbedre tiltakstekstene under. Returner maks 5 nummererte linjer.
-Ikke legg til nye tiltak som ikke finnes i teksten.
-Hopp over tomme tiltak.
-Gjør hvert tiltak konkret, kundevennlig og handlingsrettet.
+Lag korte kommentarer til tomme sjekklistefelt der status er valgt.
+Returner kun gyldig JSON-objekt.
+Nøkkel skal være eksakt sjekklistepunkt, verdi skal være kort kommentar.
+Ikke lag kommentar for punkter uten status.
+Ikke finn på tekniske funn.
 
-Tiltak:
-${JSON.stringify(rows)}
+HELE RAPPORTEN:
+${summary}`;
+  }
 
-RAPPORT:
+  if (mode === "conclusion") {
+    return `${rules}
+
+OPPGAVE:
+Lag en kort konklusjon basert på hele rapporten.
+Svar kun med tekst til konklusjonsfeltet.
+Konklusjonen skal oppsummere:
+- om årlig kontroll er gjennomført
+- generell status
+- relevante avvik/observasjoner
+- anbefalt videre oppfølging hvis relevant
+
+Ikke legg til fakta.
+
+HELE RAPPORTEN:
 ${summary}`;
   }
 
@@ -202,51 +192,127 @@ ${summary}`;
     return `${rules}
 
 OPPGAVE:
-Foreslå 1-5 anbefalte tiltak basert på observasjon, sjekkliste og konklusjon.
+Foreslå 1-5 anbefalte tiltak basert på observasjon, sjekkliste og øvrig rapport.
 Ikke finn på tekniske funn.
-Bruk bare tiltak som følger naturlig av det som er skrevet.
-Hvis det er lite informasjon, gi generelle og forsiktige anbefalinger.
 Returner nummerert liste uten overskrift.
 
-RAPPORT:
+HELE RAPPORTEN:
 ${summary}`;
   }
 
-  if (mode === "make_conclusion") {
+  if (mode === "quality") {
     return `${rules}
 
 OPPGAVE:
-Lag en kort og solid konklusjon fra rapporten.
-Konklusjonen skal passe i feltet KONKLUSJON.
-Ikke ta med overskrift.
-Ikke legg til fakta.
-Nevn om årlig kontroll er gjennomført, generell status, eventuelle avvik/tiltak og videre oppfølging hvis relevant.
-
-RAPPORT:
-${summary}`;
-  }
-
-  if (mode === "full_review") {
-    return `${rules}
-
-OPPGAVE:
-Kvalitetssjekk rapporten før den sendes til kunde.
+Kvalitetssjekk rapporten før sending til kunde.
 Svar med korte punkter:
-1. Hva bør forbedres før sending
-2. Mulige manglende avklaringer
-3. Om Jira/saksnummer/videre tiltak bør nevnes
-4. Om konklusjonen henger sammen med observasjonene
-Ikke skriv om rapporten. Gi kun sjekkpunkter.
+- Hva bør forbedres
+- Om noe bør avklares
+- Om Jira/saksnummer/videre oppfølging bør nevnes
+- Om konklusjonen henger sammen med observasjonen
+- Om teksten virker kundevennlig og profesjonell
 
-RAPPORT:
+Ikke skriv om hele rapporten.
+
+HELE RAPPORTEN:
 ${summary}`;
   }
 
-  return `${rules}
+  return `${rules}\n\nSkriv rapporttekst basert på:\n${summary}`;
+}
 
-OPPGAVE:
-Skriv kundevennlig rapporttekst basert på rapporten:
-${summary}`;
+function extractOpenAIText(result) {
+  if (typeof result.output_text === "string") return result.output_text;
+
+  if (Array.isArray(result.output)) {
+    const parts = [];
+    for (const item of result.output) {
+      if (Array.isArray(item.content)) {
+        for (const c of item.content) {
+          if (typeof c.text === "string") parts.push(c.text);
+          if (typeof c.content === "string") parts.push(c.content);
+        }
+      }
+    }
+    return parts.join("\n").trim();
+  }
+
+  return "";
+}
+
+async function callOpenAI(data) {
+  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model,
+      instructions: "Du skriver presise, faktabaserte og kundevennlige norske rapporttekster for tekniske kontroller.",
+      input: buildPrompt(data),
+      temperature: 0.2,
+      max_output_tokens: data.mode === "quality" ? 900 : 650
+    })
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    return {
+      ok: false,
+      status: response.status,
+      error: result?.error?.message || result?.message || `Feil fra OpenAI. HTTP ${response.status}`
+    };
+  }
+
+  return {
+    ok: true,
+    text: extractOpenAIText(result)
+  };
+}
+
+async function callGitHubModels(data) {
+  const model = process.env.GITHUB_MODEL || "openai/gpt-4.1-mini";
+  const response = await fetch("https://models.github.ai/inference/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.GITHUB_TOKEN}`,
+      "Content-Type": "application/json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        {
+          role: "system",
+          content: "Du skriver presise, faktabaserte og kundevennlige norske rapporttekster for tekniske kontroller."
+        },
+        {
+          role: "user",
+          content: buildPrompt(data)
+        }
+      ],
+      temperature: 0.2,
+      max_tokens: data.mode === "quality" ? 900 : 650
+    })
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    return {
+      ok: false,
+      status: response.status,
+      error: result?.message || result?.error?.message || `Feil fra GitHub Models. HTTP ${response.status}`
+    };
+  }
+
+  return {
+    ok: true,
+    text: result?.choices?.[0]?.message?.content || ""
+  };
 }
 
 module.exports = async function handler(req, res) {
@@ -254,60 +320,42 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Kun POST er støttet." });
   }
 
-  if (!process.env.GITHUB_TOKEN) {
-    return res.status(500).json({ error: "GITHUB_TOKEN mangler i Vercel Environment Variables." });
-  }
-
   try {
     const data = parseBody(req);
-    const prompt = buildPrompt(data);
-    const model = process.env.GITHUB_MODEL || "openai/gpt-4.1-mini";
 
-    const response = await fetch("https://models.github.ai/inference/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.GITHUB_TOKEN}`,
-        "Content-Type": "application/json",
-        "X-GitHub-Api-Version": "2022-11-28"
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          {
-            role: "system",
-            content: "Du skriver presise, nøkterne og kundevennlige norske rapporttekster for tekniske kontroller. Du er faktabasert og legger ikke til opplysninger som ikke finnes i grunnlaget."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.2,
-        max_tokens: data.mode === "full_review" ? 900 : 750
-      })
-    });
+    let result;
+    let provider = "";
 
-    const result = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: result?.message || result?.error?.message || `Feil fra GitHub Models. HTTP ${response.status}`
+    if (process.env.OPENAI_API_KEY) {
+      provider = "OpenAI";
+      result = await callOpenAI(data);
+    } else if (process.env.GITHUB_TOKEN) {
+      provider = "GitHub Models";
+      result = await callGitHubModels(data);
+    } else {
+      return res.status(500).json({
+        error: "Mangler API-nøkkel. Legg inn OPENAI_API_KEY i Vercel Environment Variables. Alternativt kan GITHUB_TOKEN brukes som fallback."
       });
     }
 
-    const content = result?.choices?.[0]?.message?.content || "";
+    if (!result.ok) {
+      return res.status(result.status || 500).json({
+        error: `${provider}: ${result.error}`
+      });
+    }
 
-    if (data.mode === "suggest_checklist_comments") {
+    const content = (result.text || "").trim();
+
+    if (data.mode === "fill_checklist") {
       try {
         const cleaned = content.replace(/^```json/i, "").replace(/^```/i, "").replace(/```$/i, "").trim();
-        const comments = JSON.parse(cleaned);
-        return res.status(200).json({ comments });
+        return res.status(200).json({ comments: JSON.parse(cleaned), provider });
       } catch {
-        return res.status(200).json({ comments: {}, text: content.trim() });
+        return res.status(200).json({ comments: {}, text: content, provider });
       }
     }
 
-    return res.status(200).json({ text: content.trim() });
+    return res.status(200).json({ text: content, provider });
   } catch (error) {
     return res.status(500).json({ error: error?.message || "Ukjent feil." });
   }
