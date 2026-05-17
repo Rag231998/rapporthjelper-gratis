@@ -9,12 +9,19 @@ function parseBody(req) {
   return req.body || {};
 }
 
+function trimKnowledge(text) {
+  const t = clean(text);
+  if (!t) return "";
+  return t.slice(0, 18000);
+}
+
 function reportSummary(d) {
   d = d || {};
   const f = d.fields || {};
   const m = d.meta || {};
 
   return `
+Løsning/kontekst: ${clean(m.solutionContext) || "ikke oppgitt"}
 Kontaktperson: ${clean(m.contactName) || "ikke oppgitt"}
 Oppdateringer avtalt med: ${clean(m.updatesAgreed) || "ikke oppgitt"}
 Oppdateringsmerknad: ${clean(m.updatesNote)}
@@ -50,6 +57,19 @@ ${JSON.stringify(d.recommended || [])}
 `;
 }
 
+function knowledgeBlock(d) {
+  const k = trimKnowledge(d?.meta?.knowledgeText);
+  if (!k) return "";
+  return `
+KUNNSKAPSGRUNNLAG:
+Dette er generell bakgrunnstekst brukeren har lagt inn. Bruk dette til terminologi, generelle sjekkpunkter og forslag.
+Ikke presenter informasjon fra kunnskapsgrunnlaget som observert hos kunde med mindre det også står i rapportfeltet.
+Ikke lim inn lange utdrag. Ikke legg til kundespesifikke fakta som ikke står i rapporten.
+
+${k}
+`;
+}
+
 function baseRules() {
   return `
 Du er en norsk rapportassistent for Ascom-teknikere som skriver kunderapport etter årlig kontroll.
@@ -70,7 +90,8 @@ Regler:
 - Hvis videre oppfølging er relevant og Jira ikke er nevnt, skriv forsiktig at det bør vurderes om forholdet skal følges opp i Jira-sak.
 - Ikke skriv at sak er opprettet hvis det ikke er oppgitt.
 - Ikke overdriv alvorlighetsgrad.
-- Ikke bruk for mye pyntespråk.
+- Ikke bruk pyntespråk.
+- Vær konkret nok for kunde, men ikke unødvendig teknisk.
 `;
 }
 
@@ -78,7 +99,8 @@ function buildPrompt(data) {
   const mode = clean(data.mode);
   const title = clean(data.sectionTitle);
   const text = clean(data.sectionText);
-  const summary = reportSummary(data.reportData);
+  const report = reportSummary(data.reportData);
+  const knowledge = knowledgeBlock(data.reportData);
   const rules = baseRules();
 
   if (mode === "rewrite") {
@@ -86,40 +108,47 @@ function buildPrompt(data) {
 
 OPPGAVE:
 Omformuler råteksten i feltet "${title}" til en ferdig rapporttekst.
-Du skal gjøre dette på samme måte som når en tekniker limer inn råtekst og ber om bedre formulering.
+Dette skal fungere som når brukeren skriver råtekst i ChatGPT og ber om bedre formulering.
 Ikke ta med overskrift.
 Ikke endre fakta.
-Ikke legg til nye detaljer som ikke er oppgitt.
+Ikke legg til nye konkrete detaljer som ikke er oppgitt.
+Bruk kunnskapsgrunnlag bare til språk, terminologi og generell presisjon.
 
 RÅTEKST:
 ${text || "(tomt felt)"}
 
 HELE RAPPORTEN SOM KONTEKST:
-${summary}`;
+${report}
+
+${knowledge}`;
   }
 
   if (mode === "append") {
     return `${rules}
 
 OPPGAVE:
-Les feltet "${title}" og hele rapporten.
-Lag 1-3 korte, relevante setninger som kan legges til nederst i samme felt uten å slette eksisterende tekst.
-Du skal særlig vurdere om noe bør nevnes om:
+Les feltet "${title}", hele rapporten og eventuelt kunnskapsgrunnlag.
+Lag 1-3 korte setninger som kan legges nederst i samme felt.
+Dette er for knappen "Mangler jeg noe?".
+Du skal vurdere om rapporten bør nevne:
 - videre oppfølging
 - Jira/saksoppfølging
 - avklaring med kunde/IT
-- dokumentasjon
-- kontrollpunkt som naturlig henger sammen med teksten
+- dokumentasjon/systemtegning
+- logger/backup/fjerndrift dersom det er naturlig
+- anbefalt tiltak hvis teksten peker på avvik
 
 Ikke gjenta det som allerede står.
-Ikke finn på fakta.
+Ikke finn på at noe er testet, utført eller opprettet.
 Hvis det ikke er noe relevant å legge til, svar med tom tekst.
 
 EKSISTERENDE TEKST:
 ${text || "(tomt felt)"}
 
 HELE RAPPORTEN:
-${summary}`;
+${report}
+
+${knowledge}`;
   }
 
   if (mode === "check_comment") {
@@ -136,7 +165,9 @@ Kommentar:
 ${text || "(tom kommentar)"}
 
 HELE RAPPORTEN:
-${summary}`;
+${report}
+
+${knowledge}`;
   }
 
   if (mode === "action") {
@@ -153,7 +184,9 @@ Tekst:
 ${text || "(tomt felt)"}
 
 HELE RAPPORTEN:
-${summary}`;
+${report}
+
+${knowledge}`;
   }
 
   if (mode === "fill_checklist") {
@@ -167,7 +200,9 @@ Ikke lag kommentar for punkter uten status.
 Ikke finn på tekniske funn.
 
 HELE RAPPORTEN:
-${summary}`;
+${report}
+
+${knowledge}`;
   }
 
   if (mode === "conclusion") {
@@ -185,19 +220,24 @@ Konklusjonen skal oppsummere:
 Ikke legg til fakta.
 
 HELE RAPPORTEN:
-${summary}`;
+${report}
+
+${knowledge}`;
   }
 
   if (mode === "suggest_recommended") {
     return `${rules}
 
 OPPGAVE:
-Foreslå 1-5 anbefalte tiltak basert på observasjon, sjekkliste og øvrig rapport.
+Foreslå 1-5 anbefalte tiltak basert på observasjon, sjekkliste, øvrig rapport og eventuelt kunnskapsgrunnlag.
 Ikke finn på tekniske funn.
+Tiltakene skal være forsiktige og relevante.
 Returner nummerert liste uten overskrift.
 
 HELE RAPPORTEN:
-${summary}`;
+${report}
+
+${knowledge}`;
   }
 
   if (mode === "quality") {
@@ -211,19 +251,21 @@ Svar med korte punkter:
 - Om Jira/saksnummer/videre oppfølging bør nevnes
 - Om konklusjonen henger sammen med observasjonen
 - Om teksten virker kundevennlig og profesjonell
+- Om noe fra kunnskapsgrunnlaget kan gi relevante generelle sjekkpunkter
 
 Ikke skriv om hele rapporten.
 
 HELE RAPPORTEN:
-${summary}`;
+${report}
+
+${knowledge}`;
   }
 
-  return `${rules}\n\nSkriv rapporttekst basert på:\n${summary}`;
+  return `${rules}\n\nSkriv rapporttekst basert på:\n${report}\n${knowledge}`;
 }
 
 function extractOpenAIText(result) {
   if (typeof result.output_text === "string") return result.output_text;
-
   if (Array.isArray(result.output)) {
     const parts = [];
     for (const item of result.output) {
@@ -236,7 +278,6 @@ function extractOpenAIText(result) {
     }
     return parts.join("\n").trim();
   }
-
   return "";
 }
 
@@ -253,7 +294,7 @@ async function callOpenAI(data) {
       instructions: "Du skriver presise, faktabaserte og kundevennlige norske rapporttekster for tekniske kontroller.",
       input: buildPrompt(data),
       temperature: 0.2,
-      max_output_tokens: data.mode === "quality" ? 900 : 650
+      max_output_tokens: data.mode === "quality" ? 900 : 700
     })
   });
 
@@ -267,10 +308,7 @@ async function callOpenAI(data) {
     };
   }
 
-  return {
-    ok: true,
-    text: extractOpenAIText(result)
-  };
+  return { ok: true, text: extractOpenAIText(result) };
 }
 
 async function callGitHubModels(data) {
@@ -285,17 +323,11 @@ async function callGitHubModels(data) {
     body: JSON.stringify({
       model,
       messages: [
-        {
-          role: "system",
-          content: "Du skriver presise, faktabaserte og kundevennlige norske rapporttekster for tekniske kontroller."
-        },
-        {
-          role: "user",
-          content: buildPrompt(data)
-        }
+        { role: "system", content: "Du skriver presise, faktabaserte og kundevennlige norske rapporttekster for tekniske kontroller." },
+        { role: "user", content: buildPrompt(data) }
       ],
       temperature: 0.2,
-      max_tokens: data.mode === "quality" ? 900 : 650
+      max_tokens: data.mode === "quality" ? 900 : 700
     })
   });
 
@@ -309,10 +341,7 @@ async function callGitHubModels(data) {
     };
   }
 
-  return {
-    ok: true,
-    text: result?.choices?.[0]?.message?.content || ""
-  };
+  return { ok: true, text: result?.choices?.[0]?.message?.content || "" };
 }
 
 module.exports = async function handler(req, res) {
@@ -322,7 +351,6 @@ module.exports = async function handler(req, res) {
 
   try {
     const data = parseBody(req);
-
     let result;
     let provider = "";
 
@@ -339,9 +367,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (!result.ok) {
-      return res.status(result.status || 500).json({
-        error: `${provider}: ${result.error}`
-      });
+      return res.status(result.status || 500).json({ error: `${provider}: ${result.error}` });
     }
 
     const content = (result.text || "").trim();
